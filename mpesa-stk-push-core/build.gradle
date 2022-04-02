@@ -2,8 +2,9 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'java'
     id("org.jetbrains.kotlin.plugin.serialization") version "1.6.10"
-}
+    id 'maven-publish'
 
+}
 group 'com.otienosamwel'
 version '1.0-SNAPSHOT'
 
