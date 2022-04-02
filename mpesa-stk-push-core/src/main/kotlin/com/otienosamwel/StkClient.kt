@@ -14,7 +14,7 @@ import io.ktor.http.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-internal class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: MpesaAppDetails) {
+class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: MpesaAppDetails) {
     private val stkDetails: StkDetails = stkDetails()
 
     companion object {
