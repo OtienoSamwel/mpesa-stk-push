@@ -23,7 +23,7 @@ dependencies {
 }
 ```
 
-##Usage
+## Usage
 This library will work on any platform that supports Kotlin/JVM. Below is a sample of the library in action inside 
 a ktor-server project. More example projects will be added soon.
 
