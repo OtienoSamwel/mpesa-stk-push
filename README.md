@@ -19,7 +19,7 @@ After this you can add the following dependency to your build.gradle file for a 
 
 ```groovy  
 dependencies {
-    implementation 'com.github.otienosamwel:mpesa-stk-push:Tag'
+    implementation 'com.github.otienosamwel:mpesa-stk-push:1.0.1'
 }
 ```
 
