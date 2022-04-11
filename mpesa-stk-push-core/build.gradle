@@ -1,7 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'java'
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.20"
     id 'maven-publish'
 
 }
@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    def ktor_version = '1.6.8'
+    def ktor_version = '2.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
@@ -24,9 +24,9 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktor_version")
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
-    implementation("io.ktor:ktor-client-serialization:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
-    implementation("io.ktor:ktor-client-auth:$ktor_version")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("junit:junit:4.13.2")
 
 }

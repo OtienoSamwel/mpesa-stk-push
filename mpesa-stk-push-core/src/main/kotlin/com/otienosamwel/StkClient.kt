@@ -1,16 +1,18 @@
 package com.otienosamwel
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
-import io.ktor.client.features.auth.*
-import io.ktor.client.features.auth.providers.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,7 +33,9 @@ class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: Mpesa
     private val tokenClient = HttpClient(CIO) {
         install(Auth) {
             basic {
+
                 sendWithoutRequest { true }
+
                 credentials {
                     BasicAuthCredentials(mpesaAppDetails.clientId, mpesaAppDetails.clientSecret)
                 }
@@ -42,8 +46,9 @@ class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: Mpesa
             level = LogLevel.ALL
         }
 
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
                 isLenient = true
                 prettyPrint = true
             })
@@ -62,8 +67,9 @@ class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: Mpesa
             contentType(ContentType.Application.Json)
         }
 
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
                 isLenient = true
                 prettyPrint = true
             })
@@ -77,7 +83,7 @@ class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: Mpesa
             bearer {
                 sendWithoutRequest { true }
                 loadTokens {
-                    val tokenInfo: TokenInfo = tokenClient.get(TOKEN_URL)
+                    val tokenInfo: TokenInfo = tokenClient.get(TOKEN_URL).body()
                     BearerTokens(tokenInfo.access_token, "")
                 }
             }
@@ -109,18 +115,20 @@ class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: Mpesa
         val password = getPassword(timeStamp)
 
         val response: HttpResponse = client.post(STK_URI) {
-            body = StkDetails(
-                AccountReference = stkDetails.AccountReference,
-                Amount = stkDetails.Amount,
-                BusinessShortCode = stkDetails.BusinessShortCode,
-                CallBackURL = stkDetails.CallBackURL,
-                PartyA = stkDetails.PartyA,
-                PartyB = stkDetails.PartyB,
-                Password = password,
-                PhoneNumber = stkDetails.PhoneNumber,
-                Timestamp = timeStamp,
-                TransactionDesc = stkDetails.TransactionDesc,
-                TransactionType = stkDetails.TransactionType
+            setBody(
+                StkDetails(
+                    AccountReference = stkDetails.AccountReference,
+                    Amount = stkDetails.Amount,
+                    BusinessShortCode = stkDetails.BusinessShortCode,
+                    CallBackURL = stkDetails.CallBackURL,
+                    PartyA = stkDetails.PartyA,
+                    PartyB = stkDetails.PartyB,
+                    Password = password,
+                    PhoneNumber = stkDetails.PhoneNumber,
+                    Timestamp = timeStamp,
+                    TransactionDesc = stkDetails.TransactionDesc,
+                    TransactionType = stkDetails.TransactionType
+                )
             )
         }
         return response.status
