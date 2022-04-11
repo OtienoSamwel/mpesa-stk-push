@@ -18,6 +18,13 @@ data class StkDetails(
 @kotlinx.serialization.Serializable
 internal data class TokenInfo(val access_token: String, val expires_in: String)
 
+
+/**
+ * This is the model class wth details regarding the mpesa application.
+ * @param clientId the client id of the application in the daraja portal.
+ * @param clientSecret the client secret of the application in the daraja portal.
+ * @param passKey the pass key of the application in the daraja portal.
+ */
 data class MpesaAppDetails(val clientId: String, val clientSecret: String, val passKey: String)
 
 

@@ -14,6 +14,12 @@ import io.ktor.http.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * The main stk client class. This class takes care of authentication and authorization of requests.
+ *
+ * @param stkDetails receives a call from the [buildStkDetails] function.
+ * @param mpesaAppDetails an instance of [MpesaAppDetails] class.
+ */
 class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: MpesaAppDetails) {
     private val stkDetails: StkDetails = stkDetails()
 
@@ -31,20 +37,42 @@ class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: Mpesa
                 }
             }
         }
-        install(Logging) { level = LogLevel.ALL }
+
+        install(Logging) {
+            level = LogLevel.ALL
+        }
+
         install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json { isLenient = true; prettyPrint = true })
+            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                isLenient = true
+                prettyPrint = true
+            })
         }
     }
 
     private val client = HttpClient(CIO) {
+
         expectSuccess = false
-        engine { requestTimeout = 50000 }
-        defaultRequest { contentType(ContentType.Application.Json) }
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json { isLenient = true; prettyPrint = true })
+
+        engine {
+            requestTimeout = 50000
         }
-        install(Logging) { level = LogLevel.ALL }
+
+        defaultRequest {
+            contentType(ContentType.Application.Json)
+        }
+
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                isLenient = true
+                prettyPrint = true
+            })
+        }
+
+        install(Logging) {
+            level = LogLevel.ALL
+        }
+
         install(Auth) {
             bearer {
                 sendWithoutRequest { true }
@@ -63,12 +91,23 @@ class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: Mpesa
 
     private fun getPassword(timeStamp: String): String {
         val stringToEncode = "${stkDetails.PartyB}${mpesaAppDetails.passKey}$timeStamp"
-        val encoded: ByteArray = Base64.getEncoder().encode(stringToEncode.toByteArray()); return String(encoded)
+        val encoded: ByteArray = Base64
+            .getEncoder()
+            .encode(stringToEncode.toByteArray())
+
+        return String(encoded)
     }
 
+    /**
+     * Makes the mpesa stk push request. This is a suspending function and can only be called within the context of a coroutine.
+     *
+     * @return  The http status code. This is only used to judge if the client received the request successfully. Details
+     * on whether the client accepted the request are sent to the callback url by safaricom.
+     */
     suspend fun makeStkPush(): HttpStatusCode {
         val timeStamp = getFormattedTime()
         val password = getPassword(timeStamp)
+
         val response: HttpResponse = client.post(STK_URI) {
             body = StkDetails(
                 AccountReference = stkDetails.AccountReference,
@@ -88,13 +127,30 @@ class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: Mpesa
     }
 }
 
+/**
+ * A builder function for the [StkDetails] class.
+ *
+ * @param accountReference A brief account description, used to identify the business.
+ * @param amount The amount to be paid from the clients account.
+ * @param businessShortCode The short code of the business, also called the till number.
+ * @param callbackUri The url to which safaricom will send a request confirming whether the client accepted the payment request.
+ * @param partyA The mpesa registered phone number of the client sending money.
+ * @param partyB Usually same as the short code of the business, also called the till number.
+ * @param phoneNumber The phone number of the client that will receive the stk prompt
+ * @param transactionDescription any additional information to be sent with the request.
+ * @return  An [StkDetails] object.
+ */
 fun buildStkDetails(
     accountReference: String,
     amount: Int,
     businessShortCode: Int,
     callbackUri: String = "https://example.com",
-    partyA: Long, partyB: Int, phoneNumber: Long, transactionDescription: String
+    partyA: Long,
+    partyB: Int = businessShortCode,
+    phoneNumber: Long,
+    transactionDescription: String
 ): StkDetails {
+
     return StkDetails(
         AccountReference = accountReference,
         Amount = amount,
