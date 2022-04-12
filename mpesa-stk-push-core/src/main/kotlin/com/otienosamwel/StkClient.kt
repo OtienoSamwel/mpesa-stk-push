@@ -12,9 +12,9 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.util.*
 import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * The main stk client class. This class takes care of authentication and authorization of requests.
@@ -97,11 +97,8 @@ class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: Mpesa
 
     private fun getPassword(timeStamp: String): String {
         val stringToEncode = "${stkDetails.PartyB}${mpesaAppDetails.passKey}$timeStamp"
-        val encoded: ByteArray = Base64
-            .getEncoder()
-            .encode(stringToEncode.toByteArray())
 
-        return String(encoded)
+        return stringToEncode.toByteArray(Charsets.UTF_8).encodeBase64()
     }
 
     /**
