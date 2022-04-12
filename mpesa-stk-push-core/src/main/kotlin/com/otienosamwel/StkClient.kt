@@ -18,12 +18,12 @@ import java.text.SimpleDateFormat
 
 /**
  * The main stk client class. This class takes care of authentication and authorization of requests.
- *
- * @param stkDetails receives a call from the [buildStkDetails] function.
- * @param mpesaAppDetails an instance of [MpesaAppDetails] class.
+ * @param stkClientConfig instance of [StkClientConfig]
  */
-class StkClient(stkDetails: () -> StkDetails, private val mpesaAppDetails: MpesaAppDetails) {
-    private val stkDetails: StkDetails = stkDetails()
+class StkClient(stkClientConfig: StkClientConfig) {
+
+    private val mpesaAppDetails = stkClientConfig.mpesaAppDetails
+    private val stkDetails = stkClientConfig.stkDetails
 
     companion object {
         private const val TOKEN_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"

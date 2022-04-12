@@ -27,5 +27,10 @@ internal data class TokenInfo(val access_token: String, val expires_in: String)
  */
 data class MpesaAppDetails(val clientId: String, val clientSecret: String, val passKey: String)
 
-
-
+/**
+ * A basic configuration class for the mpesa stk push client.
+ *
+ * @param stkDetails receives a call from the [buildStkDetails] function.
+ * @param mpesaAppDetails an instance of [MpesaAppDetails] class.
+ */
+data class StkClientConfig(val stkDetails: StkDetails, val mpesaAppDetails: MpesaAppDetails)
