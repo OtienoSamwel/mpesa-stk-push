@@ -83,7 +83,9 @@ class StkClient(stkClientConfig: StkClientConfig) {
             bearer {
                 sendWithoutRequest { true }
                 loadTokens {
-                    val tokenInfo: TokenInfo = tokenClient.get(TOKEN_URL).body()
+                    lateinit var tokenInfo: TokenInfo
+                    tokenClient.use { tokenInfo = it.get(TOKEN_URL).body() }
+
                     BearerTokens(tokenInfo.access_token, "")
                 }
             }
@@ -111,22 +113,26 @@ class StkClient(stkClientConfig: StkClientConfig) {
         val timeStamp = getFormattedTime()
         val password = getPassword(timeStamp)
 
-        val response: HttpResponse = client.post(STK_URI) {
-            setBody(
-                StkDetails(
-                    AccountReference = stkDetails.AccountReference,
-                    Amount = stkDetails.Amount,
-                    BusinessShortCode = stkDetails.BusinessShortCode,
-                    CallBackURL = stkDetails.CallBackURL,
-                    PartyA = stkDetails.PartyA,
-                    PartyB = stkDetails.PartyB,
-                    Password = password,
-                    PhoneNumber = stkDetails.PhoneNumber,
-                    Timestamp = timeStamp,
-                    TransactionDesc = stkDetails.TransactionDesc,
-                    TransactionType = stkDetails.TransactionType
+        lateinit var response: HttpResponse
+
+        client.use {
+            response = it.post(STK_URI) {
+                setBody(
+                    StkDetails(
+                        AccountReference = stkDetails.AccountReference,
+                        Amount = stkDetails.Amount,
+                        BusinessShortCode = stkDetails.BusinessShortCode,
+                        CallBackURL = stkDetails.CallBackURL,
+                        PartyA = stkDetails.PartyA,
+                        PartyB = stkDetails.PartyB,
+                        Password = password,
+                        PhoneNumber = stkDetails.PhoneNumber,
+                        Timestamp = timeStamp,
+                        TransactionDesc = stkDetails.TransactionDesc,
+                        TransactionType = stkDetails.TransactionType
+                    )
                 )
-            )
+            }
         }
         return response.status
     }
