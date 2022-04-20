@@ -2,7 +2,7 @@
 
 # Mpesa-stk-push
 
-An mpesa library to perform stk push requests with minimal configuration. Thia library is a wrapper around the mpesa
+An mpesa library to perform stk push requests with minimal configuration. This library is a wrapper around the mpesa
 express daraja api.
 
 ## Installation
