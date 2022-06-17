@@ -25,7 +25,7 @@ class StkClient(stkClientConfig: StkClientConfig) {
     private val mpesaAppDetails = stkClientConfig.mpesaAppDetails
     private val stkDetails = stkClientConfig.stkDetails
 
-    companion object {
+    private companion object {
         private const val TOKEN_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
         private const val STK_URI = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
     }
@@ -132,7 +132,7 @@ class StkClient(stkClientConfig: StkClientConfig) {
                         TransactionType = stkDetails.TransactionType
                     )
                 )
-            }
+            }.body()
         }
         return response.status
     }
