@@ -16,4 +16,9 @@ internal class StkClientTest {
         assertTrue(withKotlin == withJava)
     }
 
+    //todo
+    @Test
+    fun ensure_the_token_client_returns_a_valid_response() {
+
+    }
 }
